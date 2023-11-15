@@ -111,6 +111,9 @@ class _WeatherPageState extends State<WeatherPage> {
             //fontWeight: FontWeight.bold,
           ),
         ),
+        Icon(Icons.sunny, color: Colors.amber),
+        Text(_weather?.mainCondition ?? 'loading weather...',
+            style: TextStyle(fontSize: 70, color: Colors.grey[800])),
       ]),
     ));
   }
