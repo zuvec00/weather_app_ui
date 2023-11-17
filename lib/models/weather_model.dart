@@ -28,3 +28,25 @@ class Weather {
     );
   }
 }
+
+class ForecastWeather {
+  final double temperature;
+  final double windSpeed;
+  final int dateTime;
+  final String mainCondition;
+
+  ForecastWeather(
+      {required this.temperature,
+      required this.windSpeed,
+      required this.dateTime,
+      required this.mainCondition});
+
+  factory ForecastWeather.fromJson(Map<String, dynamic> json) {
+    return ForecastWeather(
+      temperature: json['data'][0]['temp'].toDouble(),
+      windSpeed: json['data'][0]['wind_speed'].toDouble(),
+      dateTime: json['data'][0]['dt'],
+      mainCondition: json['data'][0]['weather'][0]['main'],
+    );
+  }
+}

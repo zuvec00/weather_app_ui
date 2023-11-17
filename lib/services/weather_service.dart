@@ -45,4 +45,21 @@ class WeatherService {
 
     //convert the loaction into a list of placemark objects
   }
+
+  Future<ForecastWeather> getForecastWeather(
+    latitude,
+    longitude,
+    dateTime,
+  ) async {
+    final response = await http.get(
+      Uri.parse(
+          '$BASE_URL/timemachine?lat=$latitude&lon=$longitude&dt=$dateTime&appid=$apiKey&units=metric'),
+    );
+    if (response.statusCode == 200) {
+      print('Response Body for forecast weather undecoded: ${response.body}');
+      return ForecastWeather.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to load forecast weather data${response.body}');
+    }
+  }
 }
