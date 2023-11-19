@@ -1,13 +1,20 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_app_project/models/weather_model.dart';
 import 'package:weather_app_project/services/weather_service.dart';
 
+import 'package:weather_app_project/pages/saved_locations.dart';
+import 'package:weather_app_project/widgets/forecast_widget..dart';
+
 class WeatherPage extends StatefulWidget {
-  const WeatherPage({super.key});
+  final Weather? weatherObject;
+  final List<ForecastWeather>? forecastWeatherObject;
+  const WeatherPage(
+      {super.key, this.weatherObject, this.forecastWeatherObject});
 
   @override
   State<WeatherPage> createState() => _WeatherPageState();
@@ -16,7 +23,6 @@ class WeatherPage extends StatefulWidget {
 class _WeatherPageState extends State<WeatherPage> {
   final _weatherService = WeatherService("e03ae067c4af9060d65a71859a23ec44");
   Weather? _weather;
-  ForecastWeather? _forecastWeather;
 
   List<ForecastWeather> dailyForecastData = [];
 
@@ -131,26 +137,27 @@ class _WeatherPageState extends State<WeatherPage> {
   }
 
   String getWeatherIcon(String? mainCondition) {
-    if (mainCondition == null) return 'assets/images/clear_icon.png';
+    if (mainCondition == null) return 'assets/images/sun.png';
     switch (mainCondition.toLowerCase()) {
       case 'clouds':
-        return 'assets/images/cloud_icon.png';
+        return 'assets/images/cloudy.png';
       case 'mist':
       case 'smoke':
       case 'haze':
       case 'fog':
+        return 'assets/images/cloudy.png';
       case 'rain':
-        return 'assets/images/rain_icon.png';
+        return 'assets/images/rain.png';
       case 'drizzle':
-        return 'assets/images/rain_icon.png';
+        return 'assets/images/rain.png';
       case 'shower rain':
-        return 'assets/images/rain_icon.png';
+        return 'assets/images/rain.png';
       case 'thunderstorm':
-        return 'assets/images/rain_icon.png';
+        return 'assets/images/storm.png';
       case 'clear':
-        return 'assets/images/clear_icon.png';
+        return 'assets/images/sun.png';
       default:
-        return 'assets/images/clear_icon.png';
+        return 'assets/images/sun.png';
     }
   }
 
@@ -162,7 +169,9 @@ class _WeatherPageState extends State<WeatherPage> {
 
   @override
   Widget build(BuildContext context) {
-    // _fetchForecastWeather();
+    bool weatherObj = widget.weatherObject != null;
+    bool forecastWeatherObj = widget.forecastWeatherObject != null;
+    print('weatherModel:$weatherObj');
     return Scaffold(
         body: Container(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -173,7 +182,9 @@ class _WeatherPageState extends State<WeatherPage> {
               Colors.black.withOpacity(0.3), BlendMode.overlay),
           fit: BoxFit.cover,
           image: AssetImage(
-            getWeatherBackgorund(_weather?.mainCondition),
+            getWeatherBackgorund(weatherObj
+                ? widget.weatherObject?.mainCondition
+                : _weather?.mainCondition),
           ),
         ),
       ),
@@ -195,16 +206,26 @@ class _WeatherPageState extends State<WeatherPage> {
                   width: 4.w,
                 ),
                 Text(
-                  getCityName(_weather?.cityName) ?? 'loading city...',
+                  getCityName(weatherObj
+                          ? widget.weatherObject?.cityName
+                          : _weather?.cityName) ??
+                      'loading city...',
                   style: TextStyle(fontSize: 18.sp),
                 )
               ],
             ),
-            Icon(
-              Icons.menu,
-              color: Colors.white,
-              size: 32.sp,
-            )
+            IconButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SavedLocations()));
+                },
+                icon: Icon(
+                  Icons.menu,
+                  color: Colors.white,
+                  size: 32.sp,
+                ))
           ],
         ),
         SizedBox(
@@ -215,7 +236,12 @@ class _WeatherPageState extends State<WeatherPage> {
             _fetchForecastWeather();
           },
           child: Text(
-            getCurrentDate(_weather?.dateTime, false) ?? 'loading date ...',
+            getCurrentDate(
+                    weatherObj
+                        ? widget.weatherObject?.dateTime
+                        : _weather?.dateTime,
+                    false) ??
+                'loading date ...',
             style: TextStyle(
               fontSize: 40.sp,
               fontWeight: FontWeight.bold,
@@ -223,15 +249,20 @@ class _WeatherPageState extends State<WeatherPage> {
           ),
         ),
         Text(
-          'Updated as of ${getCurrentDate(_weather?.dateTime, true) ?? 'loading date...'}',
+          'Updated as of ${getCurrentDate(weatherObj ? widget.weatherObject?.dateTime : _weather?.dateTime, true) ?? 'loading date...'}',
           style: TextStyle(
             fontSize: 16.sp,
             //fontWeight: FontWeight.bold,
           ),
         ),
-        Icon(Icons.sunny, color: Colors.amber),
+        Image.asset(
+          getWeatherIcon(weatherObj
+              ? widget.weatherObject?.mainCondition
+              : _weather?.mainCondition),
+          height: 94.h,
+        ),
         Text(
-          _weather?.mainCondition ?? 'loading weather...',
+          '${weatherObj ? widget.weatherObject?.mainCondition : _weather?.mainCondition}',
           style: TextStyle(
             fontSize: 40.sp,
             fontWeight: FontWeight.bold,
@@ -242,13 +273,15 @@ class _WeatherPageState extends State<WeatherPage> {
             //style: DefaultTextStyle.of(context).style,
             children: [
               TextSpan(
-                text: '${_weather?.temperature}' ?? 'loading temperature',
-                style: TextStyle(fontSize: 86.sp, color: Colors.white),
+                text:
+                    '${weatherObj ? widget.weatherObject?.temperature : _weather?.temperature}',
+                style: GoogleFonts.roboto(fontSize: 86.sp, color: Colors.white),
               ),
               TextSpan(
                 text: '˚C',
-                style: TextStyle(
+                style: GoogleFonts.roboto(
                     fontSize: 24.sp,
+                    fontWeight: FontWeight.bold,
                     fontFeatures: [FontFeature.superscripts()]),
                 // textScaleFactor: 0.8,
               ),
@@ -281,7 +314,7 @@ class _WeatherPageState extends State<WeatherPage> {
                   height: 4.h,
                 ),
                 Text(
-                  '${_weather?.humidity}%' ?? 'loading humidity...',
+                  '${weatherObj ? widget.weatherObject?.humidity : _weather?.humidity}%',
                   style: TextStyle(
                     fontSize: 14.sp,
                   ),
@@ -308,7 +341,7 @@ class _WeatherPageState extends State<WeatherPage> {
                   height: 4.h,
                 ),
                 Text(
-                  '${_weather?.windSpeed}km/h' ?? 'loading windspeed...',
+                  '${weatherObj ? widget.weatherObject?.windSpeed : _weather?.windSpeed}km/h',
                   style: TextStyle(
                     fontSize: 14.sp,
                   ),
@@ -335,7 +368,7 @@ class _WeatherPageState extends State<WeatherPage> {
                   height: 4.h,
                 ),
                 Text(
-                  '${_weather?.feelsLike}˚' ?? 'loading temp...',
+                  '${weatherObj ? widget.weatherObject?.feelsLike : _weather?.feelsLike}˚',
                   style: TextStyle(
                     fontSize: 14.sp,
                   ),
@@ -348,7 +381,7 @@ class _WeatherPageState extends State<WeatherPage> {
           height: 28.h,
         ),
         Container(
-          height: 153.h,
+          height: 155.h,
           //width: 345.w,
           padding: EdgeInsets.symmetric(horizontal: 19.w, vertical: 18.h),
           decoration: BoxDecoration(
@@ -359,42 +392,24 @@ class _WeatherPageState extends State<WeatherPage> {
               Expanded(
                 child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    itemCount: dailyForecastData.length,
+                    itemCount: forecastWeatherObj
+                        ? widget.forecastWeatherObject!.length
+                        : dailyForecastData.length,
                     itemBuilder: ((context, index) {
-                      return Padding(
-                        padding: EdgeInsets.only(right: 40.w),
-                        child: Column(
-                          children: [
-                            Text(
-                              getForecastDate(dailyForecastData[index].dateTime)
-                                  .toString(),
-                              style: TextStyle(fontSize: 14.sp),
-                            ),
-                            SizedBox(
-                              height: 12.h,
-                            ),
-                            // Image.asset(getWeatherIcon(
-                            //   dailyForecastData[index].mainCondition),height: 32.h,),
-                            SizedBox(
-                              height: 7.h,
-                            ),
-                            Text(
-                              '${dailyForecastData[index].temperature}˚',
-                              style: TextStyle(fontSize: 16.sp),
-                            ),
-                            SizedBox(
-                              height: 7.h,
-                            ),
-                            Text(
-                              '${dailyForecastData[index].temperature}',
-                              style: TextStyle(fontSize: 10.sp),
-                            ),
-                            Text(
-                              'km/h',
-                              style: TextStyle(fontSize: 10.sp),
-                            )
-                          ],
-                        ),
+                      return ForecastWidget(
+                        dateTime: getForecastDate(forecastWeatherObj
+                                ? widget.forecastWeatherObject![index].dateTime
+                                : dailyForecastData[index].dateTime) ??
+                            '',
+                        temperature: forecastWeatherObj
+                            ? widget.forecastWeatherObject![index].temperature
+                            : dailyForecastData[index].temperature,
+                        windSpeed: forecastWeatherObj
+                            ? widget.forecastWeatherObject![index].windSpeed
+                            : dailyForecastData[index].windSpeed,
+                        weatherIcon: getWeatherIcon(forecastWeatherObj
+                            ? widget.forecastWeatherObject![index].mainCondition
+                            : dailyForecastData[index].mainCondition),
                       );
                     })),
               ),

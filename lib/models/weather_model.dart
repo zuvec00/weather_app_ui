@@ -1,7 +1,7 @@
 class Weather {
-  final double feelsLike;
-  final double humidity;
-  final double temperature;
+  final int feelsLike;
+  final int humidity;
+  final int temperature;
   final double windSpeed;
   final int dateTime;
   final String cityName;
@@ -18,9 +18,9 @@ class Weather {
 
   factory Weather.fromJson(Map<String, dynamic> json) {
     return Weather(
-      feelsLike: json['current']['feels_like'].toDouble(),
-      humidity: json['current']['humidity'].toDouble(),
-      temperature: json['current']['temp'].toDouble(),
+      feelsLike: json['current']['feels_like'].toInt(),
+      humidity: json['current']['humidity'].toInt(),
+      temperature: json['current']['temp'].toInt(),
       windSpeed: json['current']['wind_speed'].toDouble(),
       dateTime: json['current']['dt'],
       cityName: json['timezone'],
@@ -30,7 +30,7 @@ class Weather {
 }
 
 class ForecastWeather {
-  final double temperature;
+  final int temperature;
   final double windSpeed;
   final int dateTime;
   final String mainCondition;
@@ -43,7 +43,7 @@ class ForecastWeather {
 
   factory ForecastWeather.fromJson(Map<String, dynamic> json) {
     return ForecastWeather(
-      temperature: json['data'][0]['temp'].toDouble(),
+      temperature: json['data'][0]['temp'].toInt(),
       windSpeed: json['data'][0]['wind_speed'].toDouble(),
       dateTime: json['data'][0]['dt'],
       mainCondition: json['data'][0]['weather'][0]['main'],

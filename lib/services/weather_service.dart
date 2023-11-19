@@ -18,8 +18,8 @@ class WeatherService {
           '$BASE_URL?lat=$latitude&lon=$longitude&appid=$apiKey&units=metric'),
     );
     if (response.statusCode == 200) {
-      print('Response Body undecoded: ${response.body}');
-      print(jsonDecode(response.body));
+      // print('Response Body undecoded: ${response.body}');
+      //print(jsonDecode(response.body));
       return Weather.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to load weather data${response.body}');
@@ -46,6 +46,29 @@ class WeatherService {
     //convert the loaction into a list of placemark objects
   }
 
+  Future<Map<String, double>> getCoordinates(String cityName) async {
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      List<Location> locations = await locationFromAddress(cityName);
+
+      if (locations.isNotEmpty) {
+        double latitude = locations.first.latitude;
+        double longitude = locations.first.longitude;
+
+        print('latitude:$latitude, longitude:$longitude');
+
+        return {'latitude': latitude, 'longitude': longitude};
+      } else {
+        throw Exception('Location not found for $cityName');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
   Future<ForecastWeather> getForecastWeather(
     latitude,
     longitude,
@@ -56,7 +79,7 @@ class WeatherService {
           '$BASE_URL/timemachine?lat=$latitude&lon=$longitude&dt=$dateTime&appid=$apiKey&units=metric'),
     );
     if (response.statusCode == 200) {
-      print('Response Body for forecast weather undecoded: ${response.body}');
+      // print('Response Body for forecast weather undecoded: ${response.body}');
       return ForecastWeather.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to load forecast weather data${response.body}');
