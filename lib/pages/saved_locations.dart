@@ -21,9 +21,10 @@ class _SavedLocationsState extends State<SavedLocations> {
   List<List<ForecastWeather>> dailyForecastData = [];
 
   Future<void> _initializeData() async {
+    await _addCurrentLocation();
     await _fetchForecastWeather();
     await _fetchWeather();
-    await _addCurrentLocation();
+
     //Navigator.pop(context);
   }
 
@@ -36,9 +37,10 @@ class _SavedLocationsState extends State<SavedLocations> {
         location['longitude'],
       );
       String? cityName = getCityName(weather.cityName);
-      if (cityName != null) {
+      print('${!savedLocations.contains(cityName)}');
+      if (cityName != null && !savedLocations.contains(cityName)) {
         setState(() {
-          savedLocations.add(cityName);
+          savedLocations.insert(0, cityName);
         });
       }
     } catch (e) {

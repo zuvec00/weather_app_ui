@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         builder: (context, child) => MaterialApp(
               theme: ThemeData(
                   textTheme: TextTheme(bodyMedium: GoogleFonts.roboto(color:Colors.white))),
-              home: WeatherPage(),
+              home: const WeatherPage(),
             ));
   }
 }
