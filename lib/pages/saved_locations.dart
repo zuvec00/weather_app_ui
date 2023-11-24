@@ -182,10 +182,13 @@ class _SavedLocationsState extends State<SavedLocations> {
                     ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            'Fetching weather data. This process may require a few seconds... ',
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.poppins(fontSize: 12.sp),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 15.w),
+                            child: Text(
+                              'Fetching weather data. This process may require a few seconds... ',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(fontSize: 12.sp),
+                            ),
                           ),
                           SizedBox(
                             height: 8.h,
